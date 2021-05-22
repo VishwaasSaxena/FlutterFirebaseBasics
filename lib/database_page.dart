@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DatabasePage extends StatefulWidget {
@@ -12,9 +13,10 @@ class DatabasePageState extends State<DatabasePage> {
   TextEditingController testName = TextEditingController();
   TextEditingController testAge = TextEditingController();
   Firestore firestore = Firestore.instance;
+  //var firebaseUser = FirebaseAuth.instance.currentUser ;
   void create(String name, int age) async {
     try {
-      await firestore.collection("User").document("testUser").setData({
+      await firestore.collection("User").document().setData({
         'Username': name,
         'Age': age,
       });
@@ -22,19 +24,21 @@ class DatabasePageState extends State<DatabasePage> {
   }
 
   void read() async {
-    DocumentSnapshot documentSnapshot;
+    QuerySnapshot documentSnapshot;
     try {
-      documentSnapshot =
-          await firestore.collection("User").document("testUser").get();
-      print(documentSnapshot.data);
+      documentSnapshot = await firestore.collection("User").getDocuments();
+      for (int i = 0; i < documentSnapshot.documents.length; i++) {
+        var a = documentSnapshot.documents[i];
+        print(a.data);
+      }
     } catch (e) {}
   }
 
-  void update() async {
+  /* void update() async {
     firestore.collection("User").document("testUser").updateData({
       'Username': 'Lucifer',
     });
-  }
+  }*/
 
   void delete() async {}
   @override
@@ -82,7 +86,7 @@ class DatabasePageState extends State<DatabasePage> {
             SizedBox(
               height: 10,
             ),
-            ElevatedButton(onPressed: update, child: Text(" Update ")),
+            ElevatedButton(onPressed: () {}, child: Text(" Update ")),
             SizedBox(height: 10),
             ElevatedButton(onPressed: () {}, child: Text("Delete")),
           ],
