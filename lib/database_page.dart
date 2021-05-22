@@ -13,10 +13,14 @@ class DatabasePageState extends State<DatabasePage> {
   TextEditingController testName = TextEditingController();
   TextEditingController testAge = TextEditingController();
   Firestore firestore = Firestore.instance;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   //var firebaseUser = FirebaseAuth.instance.currentUser ;
   void create(String name, int age) async {
+    FirebaseUser user = await firebaseAuth.currentUser as FirebaseUser;
+    String uid = user.uid;
     try {
-      await firestore.collection("User").document().setData({
+      await firestore.collection("User").document(uid).setData({
         'Username': name,
         'Age': age,
       });
@@ -24,14 +28,18 @@ class DatabasePageState extends State<DatabasePage> {
   }
 
   void read() async {
-    QuerySnapshot documentSnapshot;
+    FirebaseUser user =
+        await FirebaseAuth.instance.currentUser() as FirebaseUser;
+    String uid = user.uid;
+    print(user.email);
+
+    DocumentSnapshot documentSnapshot;
     try {
-      documentSnapshot = await firestore.collection("User").getDocuments();
-      for (int i = 0; i < documentSnapshot.documents.length; i++) {
-        var a = documentSnapshot.documents[i];
-        print(a.data);
-      }
-    } catch (e) {}
+      documentSnapshot = await firestore.collection("User").document(uid).get();
+      print(documentSnapshot.data);
+    } catch (e) {
+      print(e);
+    }
   }
 
   /* void update() async {
